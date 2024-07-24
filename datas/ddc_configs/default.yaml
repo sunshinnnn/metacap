@@ -1,0 +1,88 @@
+#Default
+
+# general settings
+projectName: DDC
+sequence: Default
+
+# Character related
+motionPath:
+characterPath:
+graphPath:
+connectionPath:
+compute_connection: False
+load_seg_weights: True
+compute_adjacency: True
+useDQ: True
+verbose: True
+
+# Datasets related
+configPath:
+countPath:
+debug: False
+dataDir:
+tfrecordName:
+tfrecordPrefix:
+outDir:
+indicesPath:
+cameraPath:
+renderH: -1
+renderW: -1
+numTrainCam: 20
+w: 350
+numWorkers: 4
+batchSize: 4
+activeCamera: []
+
+# Model related
+egNetInit: zero
+lightingInit: zero
+deltaNetInit: zero
+texNetInit: zero
+weight_dir:
+
+# EGNet
+EGNet:
+  denseInitializerScale: 0.001
+  dataFormat: 'channels_first'
+  featureSize1: 16
+  featureSize2: 16
+  useBatchNorm: True
+  fullyConnected: 'nofull'
+  ringValue: 2
+  normalize: 1
+  denseInnerBlock: 0
+  numResidualBlocks: 8
+
+# DeltaNet
+DeltaNet:
+  denseInitializerScale: 0.001
+  dataFormat: 'channels_first'
+  featureSize1: 16
+  featureSize2: 16
+  useBatchNorm: False
+  fullyConnected: 'nofull'
+  ringValue: 3
+  normalize: 1
+  denseInnerBlock: 1
+  numResidualBlocks: 8
+
+
+
+# Training related
+gpus: [0]
+logFreq: 5
+logFreqTf: 5
+maxIter: 10000
+
+optimizer:
+  type: Adamax
+  args:
+    lr: 0.0001
+    weight_decay: 0
+
+lr_scheduler:
+  type: MultiStepLR
+  args:
+    milestones: [999999]
+    gamma: 1
+

@@ -1,0 +1,10 @@
+root_dir: /CT/HOIMOCAP4/work/code/metacap
+exp_dir: /CT/HOIMOCAP4/work/results/metacap/exp/${dataset.subject}
+runs_dir: /CT/HOIMOCAP4/work/results/metacap/runs/${dataset.subject}
+
+dataset:
+  smpl_dir: ${root_dir}/datas/SMPLX/smpl
+  rotate_shift: 0
+  camera_scale: 1000.0
+model:
+  grid_pre: False

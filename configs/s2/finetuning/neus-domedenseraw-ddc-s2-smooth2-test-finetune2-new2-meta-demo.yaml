@@ -1,0 +1,179 @@
+name: neus-domedense-${dataset.scene}-test-demo
+tag: ''
+seed: 42
+
+defaults:
+  - ../../base.yaml
+
+dataset:
+  name: domedenseraw
+  subject: Subject0002
+
+  frame: -1
+  data_dir:  ${root_dir}/datas/demo/${dataset.subject}/tight/testing_demo
+  scene: ${dataset.subject}-${dataset.frame}
+  img_downscale: 1 # specify training image size by either img_wh or img_downscale
+  camera_scale: 1000.0
+  near_plane: 2.0
+  far_plane: 6.0
+  train_split: 'train'
+  val_split: 'val'
+  test_split: 'test'
+  deformer: 'ddc'
+  cano_motion: 'template' # 'world'
+  default_path: ${root_dir}/datas/ddc_configs/default.yaml
+  config_path: ${root_dir}/datas/ddc_configs/s2_smooth_eg.yaml
+  active_camera: [47, 66, 77, 89]
+  active_camera_all: False
+  active_camera_test: [1, 14, 25, 39, 111, 113]
+  smooth: True
+  smoothDQ: False
+  subdiv: 0
+  loose: False
+  rotate: False
+  rotate_dir: ${root_dir}/datas/rotate_dir
+  rotate_template: False
+  compute_occlusion: False
+  test_interval: 1
+  rotate_w: 540
+  occlusion_template_dir: ${root_dir}/datas/color_proxy_s2
+  threshold_smpl: 0.075
+  threshold_ddc : 0.05
+  threshold_outer : 0.05
+  erode_mask: False #True #False #True
+  smpl_name: "smpl_params_smplx.npz"
+  smpl_gender: 'neutral'
+  rotate_ele: [0]
+  rotate_step: 4
+  rotate_scale: 1.0
+  ddc_name: "ddc_all_smooth_less_new.npz"
+  with_depth: False
+  threshold_rigid: 0.05
+  preload: True
+  depth_shift: 0.0
+model:
+  decay_step: 5000
+  grid_resolution:  256
+  name: neus
+  radius: 1.25
+  num_samples_per_ray: 1024
+  train_num_rays: 256
+  max_train_num_rays: 8192
+  grid_prune: true
+  grid_prune_occ_thre: 0.001
+  dynamic_ray_sampling: false
+  batch_image_sampling: true
+  randomized: true
+  ray_chunk: 4096
+  cos_anneal_end: 20000
+  learned_background: false
+  background_color: random
+  variance:
+    init_val: 0.3
+    modulate: false
+  geometry:
+    name: volume-sdf
+    radius: ${model.radius}
+    feature_dim: 13
+    grad_type: analytic
+    isosurface:
+      method: mc
+      resolution: [256,512,256]
+      chunk: 2097152
+      threshold: 0.
+    xyz_encoding_config:
+      otype: HashGrid
+      n_levels:  12 #14
+      n_features_per_level: 2
+      log2_hashmap_size: 19
+      base_resolution: 16
+      per_level_scale: 1.447269237440378
+      include_xyz: true
+      include_feat: false
+    mlp_network_config:
+      otype: VanillaMLP
+      activation: ReLU
+      output_activation: none
+      n_neurons: 64
+      n_hidden_layers: 1
+      sphere_init: true
+      sphere_init_radius: 0.5
+      weight_norm: false
+  texture:
+    name: volume-radiance
+    input_feature_dim: ${add:${model.geometry.feature_dim},3} # surface normal as additional input
+    dir_encoding_config:
+      otype: Identity
+      scale: 1.0
+      offset: 0.0
+    mlp_network_config:
+      otype: FullyFusedMLP
+      activation: ReLU
+      output_activation: none
+      n_neurons: 64
+      n_hidden_layers: 2
+    color_activation: sigmoid
+
+system:
+  name: neus-system
+  loss:
+    lambda_rgb_huber: 10.0
+    lambda_rgb_mse: 0.
+    lambda_rgb_l1: 0.
+    lambda_mask: 0.1
+    lambda_eikonal: 0.1
+    lambda_sparsity: 0.01
+    lambda_distortion: 0.
+    lambda_opaque: 0.
+    sparsity_scale: 1.
+    lambda_sdf_reg: 0
+  optimizer:
+    name: Adam
+    args:
+      lr: 0.01
+      betas: [0.9, 0.99]
+      eps: 1.e-15
+#    params:
+#      geometry:
+#          lr: 0.01
+#      texture:
+#          lr: 0.01
+##            lr: 0.001
+#      variance:
+##          lr: 0.001
+#          lr: 0.01
+
+  warmup_steps: 0
+  scheduler:
+    name: SequentialLR
+    interval: step
+    milestones:
+      - ${system.warmup_steps}
+    schedulers:
+      - name: LinearLR # linear warm-up in the first system.warmup_steps steps
+        args:
+          start_factor: 0.01 #0.0001 -> 0.1
+          end_factor: 1.0
+          total_iters: ${system.warmup_steps}
+      - name: ExponentialLR
+        args:
+          gamma: ${calc_exp_lr_decay_rate:0.1,${sub:${trainer.max_steps},${system.warmup_steps}} }
+
+checkpoint:
+  save_top_k: -1
+  every_n_train_steps: ${trainer.max_steps}
+
+export:
+  save_mesh: True
+  chunk_size: 2097152
+  export_vertex_color: True  
+
+trainer:
+  max_steps: 3000
+  log_every_n_steps: 10
+  num_sanity_val_steps: 0
+  val_check_interval: 3000
+  limit_train_batches: 1.0
+  limit_val_batches: 15
+  enable_progress_bar: true 
+  precision: 16

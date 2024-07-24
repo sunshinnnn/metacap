@@ -1,0 +1,13 @@
+./datas/color_proxy_s2/mask_imgs/*.png
+./datas/color_proxy_s2/*.npz
+
+./datas/rotate_dir/*.png
+./datas/rotate_dir/*.npz
+
+./datas/SMPLX/smpl/*.pkl
+
+./tools/extensions/libmesh/build/*
+./tools/extensions/libmesh/dist/*
+./tools/extensions/libmesh/libmesh.egg-info/*
+./tools/extensions/libmesh/triangle_hash.cp38-win_amd64
+./tools/extensions/libmesh/triangle_hash.cpython-38-x86_64-linux-gnu.so

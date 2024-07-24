@@ -1,0 +1,63 @@
+#Default
+
+# general settings
+sequence: S27Smooth
+
+# Character related
+#motion_path: /CT/HOIMOCAP2/work/data/VladNew/training/motions/poseAngles.motion
+#camera_path: /CT/HOIMOCAP2/work/data/Subject0000/cameras_training.calibration
+characterPath: /CT/HOIMOCAP3/work/data/Subject0027/tight/smoothCharacter/actor.character
+graphPath: /CT/HOIMOCAP3/work/data/Subject0027/tight/smoothCharacter/actorSimplified.obj
+connectionPath:
+compute_connection: False
+useDQ: True
+verbose: True
+
+# Datasets related
+debug: True
+dataDir: /CT/HOIMOCAP3/work/data/Subject0027/tight/training
+tfrecordName: tfrecord
+tfrecordPrefix: test_indices
+outDir: /CT/HOIMOCAP3/work/data/Subject0027/tight/training/results
+indicesPath: /CT/HOIMOCAP3/work/data/Subject0027/tight/training/training_indices_less.txt
+cameraPath: /CT/HOIMOCAP3/work/data/Subject0027/tight/cameras_training.calibration
+renderH: -1
+renderW: -1
+numTrainCam: 20
+w: 350
+numWorkers: 4
+batchSize: 4
+activeCamera: []
+# Model related
+# EGNet
+EGNet:
+  denseInitializerScale: 0.001
+  dataFormat: 'channels_first'
+  featureSize1: 16
+  featureSize2: 16
+  useBatchNorm: False
+  fullyConnected: 'nofull'
+  ringValue: 2
+  normalize: 1
+  denseInnerBlock: 0
+  numResidualBlocks: 8
+
+
+
+# DeltaNet
+
+
+# Training related
+gpus: [0]
+logFreq: 2
+logFreqTf: 2
+maxIter: 10000
+
+w_Silh:        100.0
+w_Render:      0.0
+w_Spatial:     0.0
+w_Chamfer:     0.0
+w_Iso:         0.0
+w_Arap:        1500.0
+
+
